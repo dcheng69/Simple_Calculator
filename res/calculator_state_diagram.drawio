@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2024-06-21T00:34:33.998Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0" version="24.5.3" etag="YMrwJC4LmCLTzKbvH3aO" type="device" pages="2">
+<mxfile host="app.diagrams.net" modified="2024-06-21T01:07:51.827Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0" version="24.5.3" etag="ZM440z6-GjlkPNXJDFOH" type="device" pages="2">
   <diagram id="LWXNjTrRbb4N-RTWdLq1" name="INFIX">
     <mxGraphModel dx="1386" dy="831" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -7,10 +7,10 @@
         <mxCell id="o6rgsAHQ6M-vYuz5BRVc-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;INFIX MODE&lt;/h1&gt;&lt;p&gt;This is a state diagram of the INFIX mode simple calculator, involved with only 0~9 and + - * /, without any operator precedence&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="30" y="30" width="180" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="o6rgsAHQ6M-vYuz5BRVc-2" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;start&lt;/font&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;strokeWidth=5;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+        <mxCell id="o6rgsAHQ6M-vYuz5BRVc-2" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;start&lt;/font&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;strokeWidth=5;perimeter=ellipsePerimeter;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
           <mxGeometry x="270" y="480" width="60" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o6rgsAHQ6M-vYuz5BRVc-4" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;State A&lt;/font&gt;" style="html=1;align=center;verticalAlign=top;rounded=1;absoluteArcSize=1;arcSize=10;dashed=0;whiteSpace=wrap;" vertex="1" parent="1">
+        <mxCell id="o6rgsAHQ6M-vYuz5BRVc-4" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;State A&lt;/font&gt;" style="html=1;align=center;verticalAlign=top;rounded=1;absoluteArcSize=1;arcSize=10;dashed=0;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
           <mxGeometry x="494" y="490" width="110" height="40" as="geometry" />
         </mxCell>
         <mxCell id="o6rgsAHQ6M-vYuz5BRVc-8" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&quot;+-*/&quot;/ &quot;null&quot;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
@@ -189,7 +189,7 @@
             <mxPoint x="1030" y="1150" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="o6rgsAHQ6M-vYuz5BRVc-71" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;State B&lt;/font&gt;" style="html=1;align=center;verticalAlign=top;rounded=1;absoluteArcSize=1;arcSize=10;dashed=0;whiteSpace=wrap;" vertex="1" parent="1">
+        <mxCell id="o6rgsAHQ6M-vYuz5BRVc-71" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;State B&lt;/font&gt;" style="html=1;align=center;verticalAlign=top;rounded=1;absoluteArcSize=1;arcSize=10;dashed=0;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
           <mxGeometry x="879" y="490" width="110" height="40" as="geometry" />
         </mxCell>
         <mxCell id="o6rgsAHQ6M-vYuz5BRVc-72" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&quot;+-*/&quot; / &quot;null&quot;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
@@ -231,7 +231,7 @@
         <mxCell id="o6rgsAHQ6M-vYuz5BRVc-80" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Calculate the result of &quot;A operator B&quot; save the result to A and display A, then update the operator with the newly input one&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="682" y="210" width="228" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="o6rgsAHQ6M-vYuz5BRVc-81" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;State C&lt;/font&gt;" style="html=1;align=center;verticalAlign=top;rounded=1;absoluteArcSize=1;arcSize=10;dashed=0;whiteSpace=wrap;" vertex="1" parent="1">
+        <mxCell id="o6rgsAHQ6M-vYuz5BRVc-81" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;State C&lt;/font&gt;" style="html=1;align=center;verticalAlign=top;rounded=1;absoluteArcSize=1;arcSize=10;dashed=0;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
           <mxGeometry x="726" y="617.5" width="110" height="40" as="geometry" />
         </mxCell>
         <mxCell id="o6rgsAHQ6M-vYuz5BRVc-82" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&quot;=&quot; / &quot;A&quot;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
