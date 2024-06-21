@@ -21,3 +21,47 @@ We will be considering the design of three versions of simple calculators:
 **Note:**
 
 ​	This project will serve as an introduction to the steps needed to proceed through all stages of the Requirements, Analysis, Design, Implementation and Testing phases. Thus, in order to simplify this process, no need to implement '**divide by zero**' error checking, nor any functionality for **entering negative numbers.** 
+
+# State Chart
+
+## RPM mode
+
+### Test Cases
+
+|                    Input                    |         Expected Output         |
+| :-----------------------------------------: | :-----------------------------: |
+|                 "1" "enter"                 |             "1" "1"             |
+|               "1" "enter" "2"               |           "1" "1" "2"           |
+|             "1" "enter" "2" "+"             |         "1" "1" "2" "3"         |
+|             "2" "enter" "1" "-"             |         "2" "2" "1" "1"         |
+|         "1" "enter" "2" "+" "3" "*"         |     "1" "1" "2" "3" "3" "9"     |
+|         "1" "enter" "2" "+" "3" "/"         |     "1" "1" "2" "3" "3" "1"     |
+| "2" "enter" "1" "enter" "3" "enter" "+" "/" | "2" "2" "1" "1" "3" "3" "3" "1" |
+
+### State Chart
+
+![calculator_state_diagram-RPN.drawio](./res/calculator_state_diagram-RPN.drawio.png)
+
+In the above state diagram, the error state and clear operation has been coloured in light orange because it is not required int his assignment.
+
+
+
+**Note:**
+
+The source file of this state chart is located in the res folder, can be edited with `draw.io` (https://app.diagrams.net/#).
+
+# Interesting Implementations
+
+## Language Parser
+
+ For a terminal based program, we can consider equations (`eg: "4 + 4.5 - (34/(8*3+-3)`)") as an language, all we need to do is to define a parser to capture the grammar of the calculator. Just imagine the compiler but a simpler one!
+
+To do this, we would need a parser generator(or compiler compiler), and Bison is just the tool for this purpose!
+
+And you can find the usage of Bison and c/c++ in this GNU example link: https://www.gnu.org/software/bison/manual/html_node/Infix-Calc.html, in which the calculator evaluates arithmetic expressions written in infix notation. 
+
+## Reference
+
+1. https://en.wikipedia.org/wiki/GNU_Bison
+2. https://www.gnu.org/software/bison/manual/html_node/Infix-Calc.html
+3. https://en.wikipedia.org/wiki/Compiler-compiler
