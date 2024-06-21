@@ -24,7 +24,29 @@ We will be considering the design of three versions of simple calculators:
 
 # State Chart
 
-## RPM mode
+## INFIX mode
+
+### Test Cases
+
+|            Input            |   Expected Output   |
+| :-------------------------: | :-----------------: |
+|           "1" "="           |       "1" "1"       |
+|         "1" "+" "2"         |       "1" "2"       |
+|         "2" "-" "1"         |       "2" "1"       |
+|       "1" "+" "2" "="       |     "1" "2" "3"     |
+|     "1" "+" "2" "*" "3"     | "1" "2" "3" "3" "9" |
+|     "1" "+" "2" "/" "3"     | "1" "2" "3" "3" "1" |
+| "2" "-" "1" "=" "+" "2" "=" | "2" "1" "1" "2" "3" |
+
+### State Chart
+
+![calculator_state_diagram-INFIX.drawio](./res/calculator_state_diagram-INFIX.drawio.png)
+
+**Note:**
+
+​	This project will serve as an introduction to the steps needed to proceed through all stages of the Requirements, Analysis, Design, Implementation and Testing phases. Thus, in order to simplify this process, no need to implement '**divide by zero**' error checking, nor any functionality for **entering negative numbers.** 
+
+## RPN mode
 
 ### Test Cases
 
