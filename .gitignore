@@ -1,1 +1,51 @@
+# QT compileation use setup
 *.pro.user
+
+# Ignore object files
+*.o
+
+# Ignore executable files
+test
+
+# Ignore dependency files
+*.d
+
+# Ignore build artifacts
+*.a
+*.so
+*.exe
+
+# Ignore debugging files
+*.gch
+*.dSYM/
+
+# Ignore temporary files
+*~
+*.swp
+*.swo
+
+# Ignore logs
+*.log
+
+# Ignore directory for IDEs
+.vscode/
+.idea/
+
+# Ignore specific IDE files
+*.sublime-project
+*.sublime-workspace
+
+# Ignore other editor-specific files
+tags
+TAGS
+*.bak
+*.tmp
+*.user
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore CMake build directory if used
+/build/
+
