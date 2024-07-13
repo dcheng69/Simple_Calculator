@@ -14,11 +14,15 @@ https://wiki.qt.io/Install_Qt_5_on_Ubuntu
 
 ### UI
 
-The UI design diagram is shown in the following diagram:
+The UI design diagram is shown in the following diagram :
 
 Currently, we use the `version 2.1` as the design.
 
 ![calculator_class_diagram-UI_UE.drawio](../res/calculator_class_diagram-UI_UE.drawio.png)
+
+Implementation with QT is shown in the following diagram:
+
+![calculator_QT_UI](../res/calculator_QT_UI.png)
 
 ### UE
 
