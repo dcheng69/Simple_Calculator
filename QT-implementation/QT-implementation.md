@@ -42,6 +42,16 @@ Employ Object Oriented design principle, I use `Operation` class as a base class
 
 Finally, I use the **simple factory design model** to finish the construction of the operation class, which simplify the arrangement of the code. This follows the **Polymorphism** principle of the OOP.
 
+### POC
+
+Implementation of the above class diagram is located under the folder `Operation_Class_POC`, with a `test.cpp` as a simple test. I have set up the Makefile for this project, for compile type `make all`, for clean type `make clean`.
+
+The test program can be implemented with CMake and Google Test Framework as the unit test.
+
+**Note:**
+
+When used in QT project, some of the definition need to be modified to adjust to QT framework!
+
 ## Packaging & Release
 
 https://chatgpt.com/share/8685a8b2-021a-4c08-949f-13142b488699
