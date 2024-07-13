@@ -98,6 +98,12 @@ The source file of this state chart is located in the res folder, can be edited 
 
 The source file of this state chart is located in the res folder, can be edited with `draw.io` (https://app.diagrams.net/#).
 
+## QT-Implementation
+
+For the QT Implementation version, please refer to the following document:
+
+https://github.com/dcheng69/Simple_Calculator/blob/dev-QT-implementation/QT-implementation/QT-implementation.md
+
 # Interesting Implementations
 
 ## Language Parser
