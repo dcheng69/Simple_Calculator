@@ -72,6 +72,32 @@ In the above state diagram, the error state and clear operation has been coloure
 
 The source file of this state chart is located in the res folder, can be edited with `draw.io` (https://app.diagrams.net/#).
 
+## INFIX-FULL mode
+
+### Test Cases
+
+|              Input              |         Expected Output         |
+| :-----------------------------: | :-----------------------------: |
+|             "1" "="             |             "1" "1"             |
+|           "1" "+" "2"           |             "1" "2"             |
+|        "1" "+" "2 " "="         |         "1" "1" "2" "3"         |
+|       "1" "+" "2" "x" "3"       |       "1" "1" "2" "2" "3"       |
+|     "1" "+" "2" "x" "3" "="     |     "1" "1" "2" "2" "3" "7"     |
+|           "(" "1" ")"           |             "1" "1"             |
+|         "(" "1" ")" "="         |           "1" "1" "1"           |
+| "(" "1" "+" "2" ")" "x" "3" "=" |   "1" "1" "2" "3" "3" "3" "9"   |
+|  "1" "+" "(" "2" "x" "3" ")" =  | "1" "1" "1" "2" "2" "3" "6" "7" |
+
+### State Chart
+
+![calculator_state_diagram-RPN.drawio](./res/calculator_state_diagram-INFIX-FULL.drawio.png)
+
+
+
+**Note:**
+
+The source file of this state chart is located in the res folder, can be edited with `draw.io` (https://app.diagrams.net/#).
+
 # Interesting Implementations
 
 ## Language Parser
