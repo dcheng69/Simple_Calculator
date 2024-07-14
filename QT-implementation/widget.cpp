@@ -1,4 +1,6 @@
 #include "widget.h"
+#include <QState>
+#include <QSignalTransition>
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent)
@@ -15,22 +17,22 @@ Widget::Widget(QWidget *parent) :
 
     // initialize the digit buttons
     for (int i = 0; i < numDigitButtons; ++i)
-        digitButtons[i] = createButton(QString::number(i), &Widget::buttonClicked);
+        digitButtons[i] = createButton(QString::number(i), &Widget::digitClicked);
 
     // intitialize the operator buttons
-    Button *plusButton = createButton(tr("+"), &Widget::buttonClicked);
-    Button *minusButton = createButton(tr("-"), &Widget::buttonClicked);
-    Button *multiplyButton = createButton(tr("*"), &Widget::buttonClicked);
-    Button *divisionButton = createButton(tr("/"), &Widget::buttonClicked);
+    plusButton = createButton(tr("+"), &Widget::plusClicked);
+    minusButton = createButton(tr("-"), &Widget::minusClick);
+    multiplyButton = createButton(tr("*"), &Widget::multiplyClicked);
+    divisionButton = createButton(tr("/"), &Widget::divisionClicked);
 
     // initialize the bracket buttons
-    Button *openBracketButton = createButton(tr("("), &Widget::buttonClicked);
-    Button *closeBracketButton = createButton(tr(")"), &Widget::buttonClicked);
+    openBracketButton = createButton(tr("("), &Widget::openBracketClicked);
+    closeBracketButton = createButton(tr(")"), &Widget::closeBracketClicked);
 
     // initialize other function buttons
-    Button *clearButton = createButton(tr("C"), &Widget::buttonClicked);
-    Button *changeSignButton = createButton(tr("-X"), &Widget::buttonClicked);
-    Button *equalSignButton = createButton(tr("="), &Widget::buttonClicked);
+    clearButton = createButton(tr("C"), &Widget::clearClicked);
+    changeSignButton = createButton(tr("-X"), &Widget::changeSignClicked);
+    equalSignButton = createButton(tr("="), &Widget::equalClicked);
 
     // arrange the layout of the calculator
     mainLayout = new QGridLayout;
@@ -66,6 +68,13 @@ Widget::Widget(QWidget *parent) :
     // set layout to the widget
     setLayout(mainLayout);
     setWindowTitle("Simple Calculator");
+
+    // set initial state
+    m_state = stateClear;
+
+    // set initial value
+    m_result = 0;
+    m_operand = 0;
 }
 
 Widget::~Widget()
@@ -85,10 +94,652 @@ Button *Widget::createButton(const QString &text, const PointerToMemberFunction 
     return button;
 }
 
+void Widget::clearCalculator() {
+    // clear the states of all the private variables
+    m_operand = 0.0;
+    operand_stk.clear();
+    operator_stk.clear();
+    display->setText("0");
+    m_state = stateClear;
+}
+
 void Widget::buttonClicked()
 {
     Button *clickedButton = qobject_cast<Button*>(sender());
     display->setText(clickedButton->text());
+    return;
+}
+
+void Widget::digitClicked() {
+    Button *clickedButton;
+    switch (m_state) {
+    case stateClear:
+        clickedButton = qobject_cast<Button*>(sender());
+        m_operand = m_operand*10 + clickedButton->text().toDouble();
+        display->setText(QString::number(m_operand));
+        m_state = stateOperand;
+        break;
+    case stateOperand:
+        clickedButton = qobject_cast<Button*>(sender());
+        m_operand = m_operand*10 + clickedButton->text().toDouble();
+        display->setText(QString::number(m_operand));
+        break;
+    case stateOperator:
+        clickedButton = qobject_cast<Button*>(sender());
+        m_operand = m_operand*10 + clickedButton->text().toDouble();
+        display->setText(QString::number(m_operand));
+        operator_stk.push(m_operator);
+        m_state = stateOperand;
+        break;
+    case stateError:
+        display->setText("error!");
+        break;
+    case stateOpenBracket:
+        clickedButton = qobject_cast<Button*>(sender());
+        m_operand = m_operand*10 + clickedButton->text().toDouble();
+        display->setText(QString::number(m_operand));
+        m_state = stateOperand;
+        break;
+    case stateCloseBracket:
+        display->setText("error!");
+        m_state = stateError;
+        break;
+    case stateChangeSign:
+        display->setText("-X error!");
+        m_state = stateError;
+        break;
+    }
+    return;
+}
+
+void Widget::plusClicked() {
+    switch (m_state) {
+    case stateClear:
+        // do nothing
+        break;
+    case stateOperand:
+        operand_stk.push(m_operand);
+        m_operand = 0.0;
+        while (!operator_stk.empty() && (operator_stk.top() == Multiply || operator_stk.top() == Division)) {
+            if (operator_stk.top() == Multiply) {
+                if (operand_stk.size() < 2) {
+                    display->setText("syntax error!");
+                    m_state = stateError;
+                    return;
+                }
+                double opd2 = operand_stk.top();
+                operand_stk.pop();
+                double opd1 = operand_stk.top();
+                operand_stk.pop();
+                operator_stk.pop();
+                operand_stk.push(opd1 * opd2);
+            } else {
+                if (operand_stk.size() < 2) {
+                    display->setText("syntax error!");
+                    m_state = stateError;
+                    return;
+                }
+                double opd2 = operand_stk.top();
+                operand_stk.pop();
+                double opd1 = operand_stk.top();
+                operand_stk.pop();
+                operator_stk.pop();
+                if (opd1 == 0) {
+                    display->setText("divided by zero error!");
+                    // transit to error state
+                    m_state = stateError;
+                } else {
+                    operand_stk.push(opd1 / opd2);
+                }
+            }
+        }
+        m_operator = Plus;
+        m_state = stateOperator;
+        break;
+    case stateOperator:
+        m_operator = Plus;
+        break;
+    case stateError:
+        display->setText("error!");
+        break;
+    case stateOpenBracket:
+        // transit to error state
+        display->setText("+ syntax error!");
+        m_state = stateError;
+        break;
+    case stateCloseBracket:
+        m_operator = Plus;
+        m_state = stateOperator;
+        break;
+    case stateChangeSign:
+        operand_stk.push(m_operand);
+        m_operand = 0.0;
+        m_operator = Plus;
+        m_state = stateOperator;
+        break;
+    }
+    return;
+}
+
+void Widget::minusClick() {
+    switch (m_state) {
+    case stateClear:
+        // do nothing
+        break;
+    case stateOperand:
+        operand_stk.push(m_operand);
+        m_operand = 0.0;
+        while (!operator_stk.empty() && (operator_stk.top() == Multiply || operator_stk.top() == Division)) {
+            if (operator_stk.top() == Multiply) {
+                if (operand_stk.size() < 2) {
+                    display->setText("syntax error!");
+                    m_state = stateError;
+                    return;
+                }
+                double opd2 = operand_stk.top();
+                operand_stk.pop();
+                double opd1 = operand_stk.top();
+                operand_stk.pop();
+                operator_stk.pop();
+                operand_stk.push(opd1 * opd2);
+            } else {
+                if (operand_stk.size() < 2) {
+                    display->setText("syntax error!");
+                    m_state = stateError;
+                    return;
+                }
+                double opd2 = operand_stk.top();
+                operand_stk.pop();
+                double opd1 = operand_stk.top();
+                operand_stk.pop();
+                operator_stk.pop();
+                if (opd2 == 0) {
+                    display->setText("divided by zero error!");
+                    // transit to error state
+                    m_state = stateError;
+                } else {
+                    operand_stk.push(opd1 / opd2);
+                }
+            }
+        }
+        m_operator = Minus;
+        m_state = stateOperator;
+        break;
+    case stateOperator:
+        m_operator = Minus;
+        break;
+    case stateError:
+        display->setText("error!");
+        break;
+    case stateOpenBracket:
+        // transit to error state
+        display->setText("- syntax error!");
+        m_state = stateError;
+        break;
+    case stateCloseBracket:
+        m_operator = Minus;
+        m_state = stateOperator;
+        break;
+    case stateChangeSign:
+        operand_stk.push(m_operand);
+        m_operand = 0.0;
+        m_operator = Minus;
+        m_state = stateOperator;
+        break;
+    }
+    return;
+}
+
+void Widget::multiplyClicked() {
+    switch (m_state) {
+    case stateClear:
+        // do nothing
+        break;
+    case stateOperand:
+        operand_stk.push(m_operand);
+        m_operand = 0.0;
+        while (!operator_stk.empty() && (operator_stk.top() == Multiply || operator_stk.top() == Division)) {
+            if (operator_stk.top() == Multiply) {
+                if (operand_stk.size() < 2) {
+                    display->setText("syntax error!");
+                    m_state = stateError;
+                    return;
+                }
+                double opd2 = operand_stk.top();
+                operand_stk.pop();
+                double opd1 = operand_stk.top();
+                operand_stk.pop();
+                operator_stk.pop();
+                operand_stk.push(opd1 * opd2);
+            } else {
+                if (operand_stk.size() < 2) {
+                    display->setText("syntax error!");
+                    m_state = stateError;
+                    return;
+                }
+                double opd2 = operand_stk.top();
+                operand_stk.pop();
+                double opd1 = operand_stk.top();
+                operand_stk.pop();
+                operator_stk.pop();
+                if (opd1 == 0) {
+                    display->setText("divided by zero error!");
+                    // transit to error state
+                    m_state = stateError;
+                } else {
+                    operand_stk.push(opd1 / opd2);
+                }
+            }
+        }
+        m_operator = Multiply;
+        m_state = stateOperator;
+        break;
+    case stateOperator:
+        m_operator = Multiply;
+        break;
+    case stateError:
+        display->setText("error!");
+        break;
+    case stateOpenBracket:
+        // transit to error state
+        display->setText("* syntax error!");
+        m_state = stateError;
+        break;
+    case stateCloseBracket:
+        m_operator = Multiply;
+        m_state = stateOperator;
+        break;
+    case stateChangeSign:
+        operand_stk.push(m_operand);
+        m_operand = 0.0;
+        m_operator = Multiply;
+        m_state = stateOperator;
+        break;
+    }
+    return;
+}
+
+void Widget::divisionClicked() {
+    switch (m_state) {
+    case stateClear:
+        // do nothing
+        break;
+    case stateOperand:
+        operand_stk.push(m_operand);
+        m_operand = 0.0;
+        while (!operator_stk.empty() && (operator_stk.top() == Multiply || operator_stk.top() == Division)) {
+            if (operator_stk.top() == Multiply) {
+                if (operand_stk.size() < 2) {
+                    display->setText("syntax error!");
+                    m_state = stateError;
+                    return;
+                }
+                double opd2 = operand_stk.top();
+                operand_stk.pop();
+                double opd1 = operand_stk.top();
+                operand_stk.pop();
+                operator_stk.pop();
+                operand_stk.push(opd1 * opd2);
+            } else {
+                if (operand_stk.size() < 2) {
+                    display->setText("syntax error!");
+                    m_state = stateError;
+                    return;
+                }
+                double opd2 = operand_stk.top();
+                operand_stk.pop();
+                double opd1 = operand_stk.top();
+                operand_stk.pop();
+                operator_stk.pop();
+                if (opd1 == 0) {
+                    display->setText("divided by zero error!");
+                    // transit to error state
+                    m_state = stateError;
+                } else {
+                    operand_stk.push(opd1 / opd2);
+                }
+            }
+        }
+        m_operator = Division;
+        m_state = stateOperator;
+        break;
+    case stateOperator:
+        m_operator = Division;
+        break;
+    case stateError:
+        display->setText("error!");
+        break;
+    case stateOpenBracket:
+        // transit to error state
+        display->setText("/ syntax error!");
+        m_state = stateError;
+        break;
+    case stateCloseBracket:
+        m_operator = Division;
+        m_state = stateOperator;
+        break;
+    case stateChangeSign:
+        operand_stk.push(m_operand);
+        m_operand = 0.0;
+        m_operator = Division;
+        m_state = stateOperator;
+        break;
+    }
+    return;
+}
+
+void Widget::openBracketClicked() {
+    switch (m_state) {
+    case stateClear:
+        operator_stk.push(OpenBracket);
+        m_state = stateOpenBracket;
+        break;
+    case stateOperand:
+        // transit to error state
+        display->setText(" ( syntax error!");
+        m_state = stateError;
+        break;
+    case stateOperator:
+        operator_stk.push(m_operator);
+        operator_stk.push(OpenBracket);
+        m_state = stateOpenBracket;
+        break;
+    case stateError:
+        display->setText("error!");
+        break;
+    case stateOpenBracket:
+        operator_stk.push(OpenBracket);
+        break;
+    case stateCloseBracket:
+        display->setText("error!");
+        m_state = stateError;
+        break;
+    case stateChangeSign:
+        display->setText("( error!");
+        m_state = stateError;
+        break;
+    }
+    return;
+}
+
+void Widget::closeBracketClicked() {
+    switch (m_state) {
+    case stateClear:
+        // do nothing
+        break;
+    case stateOperand:
+        operand_stk.push(m_operand);
+        m_operand = 0.0;
+        while (!operator_stk.empty() && operator_stk.top() != OpenBracket) {
+            if (operand_stk.size() < 2) {
+                display->setText("syntax error!");
+                m_state = stateError;
+                return;
+            }
+            // pop out one operator and two operands and process
+            double opd2 = operand_stk.top();
+            operand_stk.pop();
+            double opd1 = operand_stk.top();
+            operand_stk.pop();
+            switch (operator_stk.top()) {
+            case Plus:
+                operand_stk.push(opd1 + opd2);
+                break;
+            case Minus:
+                operand_stk.push(opd1 - opd2);
+                break;
+            case Multiply:
+                operand_stk.push(opd1 * opd2);
+                break;
+            case Division:
+                if (opd2 == 0) {
+                    display->setText("divided by zero error!");
+                    m_state = stateError;
+                    return;
+                } else
+                    operand_stk.push(opd1 / opd2);
+                break;
+            }
+            operator_stk.pop();
+        }
+        if (!operator_stk.empty() && operator_stk.top() == OpenBracket)
+            operator_stk.pop();
+        m_state = stateCloseBracket;
+        break;
+    case stateOperator:
+        m_state = stateError;
+        break;
+    case stateError:
+        display->setText("error!");
+        break;
+    case stateOpenBracket:
+        // transit to error state
+        display->setText(") syntax error!");
+        m_state = stateError;
+        break;
+    case stateCloseBracket:
+        while (!operator_stk.empty() && operator_stk.top() != OpenBracket) {
+            if (operand_stk.size() < 2) {
+                display->setText("syntax error!");
+                m_state = stateError;
+                return;
+            }
+            // pop out one operator and two operands and process
+            double opd2 = operand_stk.top();
+            operand_stk.pop();
+            double opd1 = operand_stk.top();
+            operand_stk.pop();
+            if (operator_stk.top() == Plus)
+                operand_stk.push(opd1 + opd2);
+            else
+                operand_stk.push(opd1 - opd2);
+            operator_stk.pop();
+        }
+        operator_stk.pop();
+        break;
+    case stateChangeSign:
+        operand_stk.push(m_operand);
+        while (!operator_stk.empty() && operator_stk.top() != OpenBracket) {
+            if (operand_stk.size() < 2) {
+                display->setText("syntax error!");
+                m_state = stateError;
+                return;
+            }
+            // pop out one operator and two operands and process
+            double opd2 = operand_stk.top();
+            operand_stk.pop();
+            double opd1 = operand_stk.top();
+            operand_stk.pop();
+            if (operator_stk.top() == Plus)
+                operand_stk.push(opd1 + opd2);
+            else
+                operand_stk.push(opd1 - opd2);
+            operator_stk.pop();
+        }
+        operator_stk.pop();
+        m_state = stateCloseBracket;
+        break;
+    }
+    return;
+}
+
+void Widget::changeSignClicked() {
+    switch (m_state) {
+    case stateClear:
+        // do nothing
+        break;
+    case stateOperand:
+        m_operand = -1 * m_operand;
+        m_state = stateChangeSign;
+        break;
+    case stateOperator:
+        // change the sign of the top of the operand_stk
+        if (!operand_stk.empty()) {
+            double temp = operand_stk.top();
+            operand_stk.pop();
+            operand_stk.push(-1 * temp);
+        }
+        break;
+    case stateError:
+        display->setText("error!");
+        break;
+    case stateOpenBracket:
+        // transit to error state
+        display->setText("-X syntax error!");
+        m_state = stateError;
+        break;
+    case stateCloseBracket:
+        display->setText("error!");
+        m_state = stateError;
+        break;
+    case stateChangeSign:
+        m_operand = -1 * m_operand;
+        break;
+    }
+    return;
+}
+
+void Widget::clearClicked() {
+    switch (m_state) {
+    case stateClear:
+        // do nothing
+        break;
+    case stateOperand:
+        clearCalculator();
+        break;
+    case stateOperator:
+        clearCalculator();
+        break;
+    case stateError:
+        clearCalculator();
+        break;
+    case stateOpenBracket:
+        clearCalculator();
+        break;
+    case stateCloseBracket:
+        clearCalculator();
+        break;
+    case stateChangeSign:
+        clearCalculator();
+        break;
+    }
+    return;
+}
+
+void Widget::equalClicked() {
+    switch (m_state) {
+    case stateClear:
+        // do nothing
+        break;
+    case stateOperand:
+        operand_stk.push(m_operand);
+        m_operand = 0.0;
+        while (!operator_stk.empty()) {
+            if (operand_stk.size() < 2) {
+                display->setText("syntax error!");
+                m_state = stateError;
+                return;
+            }
+            double opd2 = operand_stk.top();
+            operand_stk.pop();
+            double opd1 = operand_stk.top();
+            operand_stk.pop();
+            operationType opr = operator_stk.top();
+            operator_stk.pop();
+            switch (opr) {
+            case Plus:
+                operand_stk.push(opd1 + opd2);
+                break;
+            case Minus:
+                operand_stk.push(opd1 - opd2);
+                break;
+            case Multiply:
+                operand_stk.push(opd1 * opd2);
+                break;
+            case Division:
+                if (opd2 == 0) {
+                    display->setText("divided by zero error!");
+                    m_state = stateError;
+                    return;
+                } else
+                    operand_stk.push(opd1 / opd2);
+            }
+        }
+        m_result = operand_stk.top();
+        display->setText(QString::number(m_result));
+        m_result = 0.0;
+        m_operand = 0.0;
+        m_state = stateOperator;
+        break;
+    case stateOperator:
+        m_state = stateError;
+        break;
+    case stateError:
+        display->setText("error!");
+        break;
+    case stateOpenBracket:
+        // transit to error state
+        display->setText("= syntax error!");
+        m_state = stateError;
+        break;
+    case stateCloseBracket:
+        while (!operator_stk.empty()) {
+            if (operand_stk.size() < 2) {
+                display->setText("syntax error!");
+                m_state = stateError;
+                return;
+            }
+            double opd2 = operand_stk.top();
+            operand_stk.pop();
+            double opd1 = operand_stk.top();
+            operand_stk.pop();
+            operationType opr = operator_stk.top();
+            operator_stk.pop();
+            switch (opr) {
+            case Plus:
+                operand_stk.push(opd1 + opd2);
+                break;
+            case Minus:
+                operand_stk.push(opd1 - opd2);
+                break;
+            }
+        }
+        m_result = operand_stk.top();
+        display->setText(QString::number(m_result));
+        m_result = 0.0;
+        m_operand = 0.0;
+        m_state = stateOperator;
+        break;
+    case stateChangeSign:
+        operand_stk.push(m_operand);
+        while (!operator_stk.empty()) {
+            if (operand_stk.size() < 2) {
+                display->setText("syntax error!");
+                m_state = stateError;
+                return;
+            }
+            double opd2 = operand_stk.top();
+            operand_stk.pop();
+            double opd1 = operand_stk.top();
+            operand_stk.pop();
+            operationType opr = operator_stk.top();
+            operator_stk.pop();
+            switch (opr) {
+            case Plus:
+                operand_stk.push(opd1 + opd2);
+                break;
+            case Minus:
+                operand_stk.push(opd1 - opd2);
+                break;
+            }
+        }
+        m_result = operand_stk.top();
+        display->setText(QString::number(m_result));
+        m_result = 0.0;
+        m_operand = 0.0;
+        m_state = stateOperator;
+        break;
+    }
     return;
 }
 
