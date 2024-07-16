@@ -564,23 +564,13 @@ void Widget::calMulDiv() {
             return;
         }
         try {
-            if (operator_stk.top() == Multiply) {
-                Operation* p_opr = OperationFactory::createOperation(Mul);
-                operator_stk.pop();
-                p_opr->setNumberB(operand_stk.top());
-                operand_stk.pop();
-                p_opr->setNumberA(operand_stk.top());
-                operand_stk.pop();
-                operand_stk.push(p_opr->getResult());
-            } else {
-                Operation* p_opr = OperationFactory::createOperation(Div);
-                operator_stk.pop();
-                p_opr->setNumberB(operand_stk.top());
-                operand_stk.pop();
-                p_opr->setNumberA(operand_stk.top());
-                operand_stk.pop();
-                operand_stk.push(p_opr->getResult());
-            }
+            Operation* p_opr = OperationFactory::createOperation(operator_stk.top());
+            p_opr->setNumberB(operand_stk.top());
+            operator_stk.pop();
+            operand_stk.pop();
+            p_opr->setNumberA(operand_stk.top());
+            operand_stk.pop();
+            operand_stk.push(p_opr->getResult());
         } catch (const std::exception& e) {
             qDebug() << "calMulDiv caught exception:" << e.what();
             throw e;
@@ -597,28 +587,9 @@ void Widget::calMulDiv() {
         }
         try {
             // pop out one operator and two operands and process
-            Operation* p_opr = nullptr;
-            switch (operator_stk.top()) {
-            case Plus:
-                p_opr = OperationFactory::createOperation(Add);
-                break;
-            case Minus:
-                p_opr = OperationFactory::createOperation(Sub);
-                break;
-            case Multiply:
-                p_opr = OperationFactory::createOperation(Mul);
-                break;
-            case Division:
-                p_opr = OperationFactory::createOperation(Div);
-                break;
-            case OpenBracket:
-            case CloseBreaket:
-            default:
-                throw new std::runtime_error("undefined operation!");
-                return;
-            }
-            operator_stk.pop();
+            Operation* p_opr = OperationFactory::createOperation(operator_stk.top());
             p_opr->setNumberB(operand_stk.top());
+            operator_stk.pop();
             operand_stk.pop();
             p_opr->setNumberA(operand_stk.top());
             operand_stk.pop();
@@ -642,28 +613,9 @@ void Widget::calAllInStack() {
         }
         try {
             // pop out one operator and two operands and process
-            Operation* p_opr = nullptr;
-            switch (operator_stk.top()) {
-            case Plus:
-                p_opr = OperationFactory::createOperation(Add);
-                break;
-            case Minus:
-                p_opr = OperationFactory::createOperation(Sub);
-                break;
-            case Multiply:
-                p_opr = OperationFactory::createOperation(Mul);
-                break;
-            case Division:
-                p_opr = OperationFactory::createOperation(Div);
-                break;
-            case OpenBracket:
-            case CloseBreaket:
-            default:
-                throw new std::runtime_error("undefined operation!");
-                return;
-            }
-            operator_stk.pop();
+            Operation* p_opr = OperationFactory::createOperation(operator_stk.top());
             p_opr->setNumberB(operand_stk.top());
+            operator_stk.pop();
             operand_stk.pop();
             p_opr->setNumberA(operand_stk.top());
             operand_stk.pop();

@@ -24,16 +24,9 @@ public:
     double getResult() override;
 };
 
-typedef enum {
-    Add = 0,
-    Sub,
-    Mul,
-    Div
-} operationImpType;
-
 class OperationFactory {
 public:
-    static Operation* createOperation(operationImpType type);
+    static Operation* createOperation(operationType type);
 };
 
 

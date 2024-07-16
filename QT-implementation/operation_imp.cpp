@@ -1,8 +1,10 @@
 #include "operation_imp.h"
+#include "widget.h"
 
 #include <QDebug>
 #include <limits>
 #include <cmath>
+#include <stdexcept>
 
 double Add::getResult() {
     double ret = 0.0;
@@ -51,20 +53,25 @@ double Div::getResult() {
     return ret;
 }
 
-Operation* OperationFactory::createOperation(operationImpType type) {
+Operation* OperationFactory::createOperation(operationType type) {
     Operation* p_oper = nullptr;
     switch (type) {
-        case Add:
+        case Plus:
             p_oper = new class Add();
             break;
-        case Sub:
+        case Minus:
             p_oper = new class Sub();
             break;
-        case Mul:
+        case Multiply:
             p_oper = new class Mul();
             break;
-        case Div:
+        case Division:
             p_oper = new class Div();
+            break;
+        case OpenBracket:
+        case CloseBreaket:
+        defautl:
+            throw new std::runtime_error("invalid operations!");
             break;
     }
     return p_oper;
