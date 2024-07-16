@@ -81,11 +81,29 @@ Widget::Widget(QWidget *parent) :
 
 Widget::~Widget()
 {
-    delete mainLayout;
-    mainLayout = nullptr;
+    clearCalculator();
+    delete display;
     display = nullptr;
+    delete plusButton;
+    plusButton = nullptr;
+    delete minusButton;
+    minusButton = nullptr;
+    delete divisionButton;
+    divisionButton = nullptr;
+    delete openBracketButton;
+    openBracketButton = nullptr;
+    delete closeBracketButton;
+    closeBracketButton = nullptr;
+    delete clearButton;
+    clearButton = nullptr;
+    delete changeSignButton;
+    changeSignButton = nullptr;
+    delete equalSignButton;
+    equalSignButton = nullptr;
     for (int i=0; i<numDigitButtons; ++i)
         digitButtons[i] = nullptr;
+    delete mainLayout;
+    mainLayout = nullptr;
 }
 
 template<typename PointerToMemberFunction>
@@ -113,7 +131,6 @@ void Widget::buttonClicked()
 }
 
 void Widget::digitClicked() {
-    Button *clickedButton;
     switch (m_state) {
     case stateClear:
         refreshDisplay();
