@@ -1,6 +1,8 @@
 #include "widget.h"
 #include <QState>
 #include <QSignalTransition>
+#include <QDebug>
+#include "operation_imp.h"
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent)
@@ -114,20 +116,15 @@ void Widget::digitClicked() {
     Button *clickedButton;
     switch (m_state) {
     case stateClear:
-        clickedButton = qobject_cast<Button*>(sender());
-        m_operand = m_operand*10 + clickedButton->text().toDouble();
-        display->setText(QString::number(m_operand));
+        refreshDisplay();
         m_state = stateOperand;
         break;
     case stateOperand:
-        clickedButton = qobject_cast<Button*>(sender());
-        m_operand = m_operand*10 + clickedButton->text().toDouble();
-        display->setText(QString::number(m_operand));
+        refreshDisplay();
+        // still in stateOperand
         break;
     case stateOperator:
-        clickedButton = qobject_cast<Button*>(sender());
-        m_operand = m_operand*10 + clickedButton->text().toDouble();
-        display->setText(QString::number(m_operand));
+        refreshDisplay();
         operator_stk.push(m_operator);
         m_state = stateOperand;
         break;
@@ -135,9 +132,7 @@ void Widget::digitClicked() {
         display->setText("error!");
         break;
     case stateOpenBracket:
-        clickedButton = qobject_cast<Button*>(sender());
-        m_operand = m_operand*10 + clickedButton->text().toDouble();
-        display->setText(QString::number(m_operand));
+        refreshDisplay();
         m_state = stateOperand;
         break;
     case stateCloseBracket:
@@ -160,38 +155,12 @@ void Widget::plusClicked() {
     case stateOperand:
         operand_stk.push(m_operand);
         m_operand = 0.0;
-        while (!operator_stk.empty() && (operator_stk.top() == Multiply || operator_stk.top() == Division)) {
-            if (operator_stk.top() == Multiply) {
-                if (operand_stk.size() < 2) {
-                    display->setText("syntax error!");
-                    m_state = stateError;
-                    return;
-                }
-                double opd2 = operand_stk.top();
-                operand_stk.pop();
-                double opd1 = operand_stk.top();
-                operand_stk.pop();
-                operator_stk.pop();
-                operand_stk.push(opd1 * opd2);
-            } else {
-                if (operand_stk.size() < 2) {
-                    display->setText("syntax error!");
-                    m_state = stateError;
-                    return;
-                }
-                double opd2 = operand_stk.top();
-                operand_stk.pop();
-                double opd1 = operand_stk.top();
-                operand_stk.pop();
-                operator_stk.pop();
-                if (opd1 == 0) {
-                    display->setText("divided by zero error!");
-                    // transit to error state
-                    m_state = stateError;
-                } else {
-                    operand_stk.push(opd1 / opd2);
-                }
-            }
+        try {
+            calMulDiv();
+        } catch (const std::exception& e) {
+            qCritical() << "calMulDiv error:" << e.what();
+            display->setText("error!");
+            m_state = stateError;
         }
         m_operator = Plus;
         m_state = stateOperator;
@@ -229,38 +198,12 @@ void Widget::minusClick() {
     case stateOperand:
         operand_stk.push(m_operand);
         m_operand = 0.0;
-        while (!operator_stk.empty() && (operator_stk.top() == Multiply || operator_stk.top() == Division)) {
-            if (operator_stk.top() == Multiply) {
-                if (operand_stk.size() < 2) {
-                    display->setText("syntax error!");
-                    m_state = stateError;
-                    return;
-                }
-                double opd2 = operand_stk.top();
-                operand_stk.pop();
-                double opd1 = operand_stk.top();
-                operand_stk.pop();
-                operator_stk.pop();
-                operand_stk.push(opd1 * opd2);
-            } else {
-                if (operand_stk.size() < 2) {
-                    display->setText("syntax error!");
-                    m_state = stateError;
-                    return;
-                }
-                double opd2 = operand_stk.top();
-                operand_stk.pop();
-                double opd1 = operand_stk.top();
-                operand_stk.pop();
-                operator_stk.pop();
-                if (opd2 == 0) {
-                    display->setText("divided by zero error!");
-                    // transit to error state
-                    m_state = stateError;
-                } else {
-                    operand_stk.push(opd1 / opd2);
-                }
-            }
+        try {
+            calMulDiv();
+        } catch (const std::exception& e) {
+            qCritical() << "calMulDiv error:" << e.what();
+            display->setText("error!");
+            m_state = stateError;
         }
         m_operator = Minus;
         m_state = stateOperator;
@@ -298,38 +241,12 @@ void Widget::multiplyClicked() {
     case stateOperand:
         operand_stk.push(m_operand);
         m_operand = 0.0;
-        while (!operator_stk.empty() && (operator_stk.top() == Multiply || operator_stk.top() == Division)) {
-            if (operator_stk.top() == Multiply) {
-                if (operand_stk.size() < 2) {
-                    display->setText("syntax error!");
-                    m_state = stateError;
-                    return;
-                }
-                double opd2 = operand_stk.top();
-                operand_stk.pop();
-                double opd1 = operand_stk.top();
-                operand_stk.pop();
-                operator_stk.pop();
-                operand_stk.push(opd1 * opd2);
-            } else {
-                if (operand_stk.size() < 2) {
-                    display->setText("syntax error!");
-                    m_state = stateError;
-                    return;
-                }
-                double opd2 = operand_stk.top();
-                operand_stk.pop();
-                double opd1 = operand_stk.top();
-                operand_stk.pop();
-                operator_stk.pop();
-                if (opd1 == 0) {
-                    display->setText("divided by zero error!");
-                    // transit to error state
-                    m_state = stateError;
-                } else {
-                    operand_stk.push(opd1 / opd2);
-                }
-            }
+        try {
+            calMulDiv();
+        } catch (const std::exception& e) {
+            qCritical() << "calMulDiv error:" << e.what();
+            display->setText("error!");
+            m_state = stateError;
         }
         m_operator = Multiply;
         m_state = stateOperator;
@@ -367,38 +284,12 @@ void Widget::divisionClicked() {
     case stateOperand:
         operand_stk.push(m_operand);
         m_operand = 0.0;
-        while (!operator_stk.empty() && (operator_stk.top() == Multiply || operator_stk.top() == Division)) {
-            if (operator_stk.top() == Multiply) {
-                if (operand_stk.size() < 2) {
-                    display->setText("syntax error!");
-                    m_state = stateError;
-                    return;
-                }
-                double opd2 = operand_stk.top();
-                operand_stk.pop();
-                double opd1 = operand_stk.top();
-                operand_stk.pop();
-                operator_stk.pop();
-                operand_stk.push(opd1 * opd2);
-            } else {
-                if (operand_stk.size() < 2) {
-                    display->setText("syntax error!");
-                    m_state = stateError;
-                    return;
-                }
-                double opd2 = operand_stk.top();
-                operand_stk.pop();
-                double opd1 = operand_stk.top();
-                operand_stk.pop();
-                operator_stk.pop();
-                if (opd1 == 0) {
-                    display->setText("divided by zero error!");
-                    // transit to error state
-                    m_state = stateError;
-                } else {
-                    operand_stk.push(opd1 / opd2);
-                }
-            }
+        try {
+            calMulDiv();
+        } catch (const std::exception& e) {
+            qCritical() << "calMulDiv error:" << e.what();
+            display->setText("error!");
+            m_state = stateError;
         }
         m_operator = Division;
         m_state = stateOperator;
@@ -470,40 +361,13 @@ void Widget::closeBracketClicked() {
     case stateOperand:
         operand_stk.push(m_operand);
         m_operand = 0.0;
-        while (!operator_stk.empty() && operator_stk.top() != OpenBracket) {
-            if (operand_stk.size() < 2) {
-                display->setText("syntax error!");
-                m_state = stateError;
-                return;
-            }
-            // pop out one operator and two operands and process
-            double opd2 = operand_stk.top();
-            operand_stk.pop();
-            double opd1 = operand_stk.top();
-            operand_stk.pop();
-            switch (operator_stk.top()) {
-            case Plus:
-                operand_stk.push(opd1 + opd2);
-                break;
-            case Minus:
-                operand_stk.push(opd1 - opd2);
-                break;
-            case Multiply:
-                operand_stk.push(opd1 * opd2);
-                break;
-            case Division:
-                if (opd2 == 0) {
-                    display->setText("divided by zero error!");
-                    m_state = stateError;
-                    return;
-                } else
-                    operand_stk.push(opd1 / opd2);
-                break;
-            }
-            operator_stk.pop();
+        try {
+            calLastBracket();
+        } catch (const std::exception& e) {
+            qCritical() << "calLastBracket error:" << e.what();
+            display->setText("error!");
+            m_state = stateError;
         }
-        if (!operator_stk.empty() && operator_stk.top() == OpenBracket)
-            operator_stk.pop();
         m_state = stateCloseBracket;
         break;
     case stateOperator:
@@ -518,45 +382,22 @@ void Widget::closeBracketClicked() {
         m_state = stateError;
         break;
     case stateCloseBracket:
-        while (!operator_stk.empty() && operator_stk.top() != OpenBracket) {
-            if (operand_stk.size() < 2) {
-                display->setText("syntax error!");
-                m_state = stateError;
-                return;
-            }
-            // pop out one operator and two operands and process
-            double opd2 = operand_stk.top();
-            operand_stk.pop();
-            double opd1 = operand_stk.top();
-            operand_stk.pop();
-            if (operator_stk.top() == Plus)
-                operand_stk.push(opd1 + opd2);
-            else
-                operand_stk.push(opd1 - opd2);
-            operator_stk.pop();
+        try {
+            calLastBracket();
+        } catch (const std::exception& e) {
+            qCritical() << "calLastBracket error:" << e.what();
+            display->setText("error!");
+            m_state = stateError;
         }
-        operator_stk.pop();
         break;
     case stateChangeSign:
-        operand_stk.push(m_operand);
-        while (!operator_stk.empty() && operator_stk.top() != OpenBracket) {
-            if (operand_stk.size() < 2) {
-                display->setText("syntax error!");
-                m_state = stateError;
-                return;
-            }
-            // pop out one operator and two operands and process
-            double opd2 = operand_stk.top();
-            operand_stk.pop();
-            double opd1 = operand_stk.top();
-            operand_stk.pop();
-            if (operator_stk.top() == Plus)
-                operand_stk.push(opd1 + opd2);
-            else
-                operand_stk.push(opd1 - opd2);
-            operator_stk.pop();
+        try {
+            calLastBracket();
+        } catch (const std::exception& e) {
+            qCritical() << "calLastBracket error:" << e.what();
+            display->setText("error!");
+            m_state = stateError;
         }
-        operator_stk.pop();
         m_state = stateCloseBracket;
         break;
     }
@@ -634,36 +475,12 @@ void Widget::equalClicked() {
     case stateOperand:
         operand_stk.push(m_operand);
         m_operand = 0.0;
-        while (!operator_stk.empty()) {
-            if (operand_stk.size() < 2) {
-                display->setText("syntax error!");
-                m_state = stateError;
-                return;
-            }
-            double opd2 = operand_stk.top();
-            operand_stk.pop();
-            double opd1 = operand_stk.top();
-            operand_stk.pop();
-            operationType opr = operator_stk.top();
-            operator_stk.pop();
-            switch (opr) {
-            case Plus:
-                operand_stk.push(opd1 + opd2);
-                break;
-            case Minus:
-                operand_stk.push(opd1 - opd2);
-                break;
-            case Multiply:
-                operand_stk.push(opd1 * opd2);
-                break;
-            case Division:
-                if (opd2 == 0) {
-                    display->setText("divided by zero error!");
-                    m_state = stateError;
-                    return;
-                } else
-                    operand_stk.push(opd1 / opd2);
-            }
+        try {
+            calAllInStack();
+        } catch (const std::exception& e) {
+            qCritical() << "calAllInStack error:" << e.what();
+            display->setText("error!");
+            m_state = stateError;
         }
         m_result = operand_stk.top();
         display->setText(QString::number(m_result));
@@ -683,26 +500,12 @@ void Widget::equalClicked() {
         m_state = stateError;
         break;
     case stateCloseBracket:
-        while (!operator_stk.empty()) {
-            if (operand_stk.size() < 2) {
-                display->setText("syntax error!");
-                m_state = stateError;
-                return;
-            }
-            double opd2 = operand_stk.top();
-            operand_stk.pop();
-            double opd1 = operand_stk.top();
-            operand_stk.pop();
-            operationType opr = operator_stk.top();
-            operator_stk.pop();
-            switch (opr) {
-            case Plus:
-                operand_stk.push(opd1 + opd2);
-                break;
-            case Minus:
-                operand_stk.push(opd1 - opd2);
-                break;
-            }
+        try {
+            calAllInStack();
+        } catch (const std::exception& e) {
+            qCritical() << "calAllInStack error:" << e.what();
+            display->setText("error!");
+            m_state = stateError;
         }
         m_result = operand_stk.top();
         display->setText(QString::number(m_result));
@@ -712,26 +515,13 @@ void Widget::equalClicked() {
         break;
     case stateChangeSign:
         operand_stk.push(m_operand);
-        while (!operator_stk.empty()) {
-            if (operand_stk.size() < 2) {
-                display->setText("syntax error!");
-                m_state = stateError;
-                return;
-            }
-            double opd2 = operand_stk.top();
-            operand_stk.pop();
-            double opd1 = operand_stk.top();
-            operand_stk.pop();
-            operationType opr = operator_stk.top();
-            operator_stk.pop();
-            switch (opr) {
-            case Plus:
-                operand_stk.push(opd1 + opd2);
-                break;
-            case Minus:
-                operand_stk.push(opd1 - opd2);
-                break;
-            }
+        m_operand = 0.0;
+        try {
+            calAllInStack();
+        } catch (const std::exception& e) {
+            qCritical() << "calAllInStack error:" << e.what();
+            display->setText("error!");
+            m_state = stateError;
         }
         m_result = operand_stk.top();
         display->setText(QString::number(m_result));
@@ -743,3 +533,129 @@ void Widget::equalClicked() {
     return;
 }
 
+void Widget::refreshDisplay() {
+    Button *clickedButton;
+    clickedButton = qobject_cast<Button*>(sender());
+    m_operand = m_operand*10 + clickedButton->text().toDouble();
+    display->setText(QString::number(m_operand));
+}
+
+void Widget::calMulDiv() {
+    while (!operator_stk.empty() && (operator_stk.top() == Multiply || operator_stk.top() == Division)) {
+        if (operand_stk.size() < 2) {
+            throw new std::runtime_error("not enough operands in operand stack!");
+            return;
+        }
+        try {
+            if (operator_stk.top() == Multiply) {
+                Operation* p_opr = OperationFactory::createOperation(Mul);
+                operator_stk.pop();
+                p_opr->setNumberB(operand_stk.top());
+                operand_stk.pop();
+                p_opr->setNumberA(operand_stk.top());
+                operand_stk.pop();
+                operand_stk.push(p_opr->getResult());
+            } else {
+                Operation* p_opr = OperationFactory::createOperation(Div);
+                operator_stk.pop();
+                p_opr->setNumberB(operand_stk.top());
+                operand_stk.pop();
+                p_opr->setNumberA(operand_stk.top());
+                operand_stk.pop();
+                operand_stk.push(p_opr->getResult());
+            }
+        } catch (const std::exception& e) {
+            qDebug() << "calMulDiv caught exception:" << e.what();
+            throw e;
+        }
+    }
+    return;
+}
+
+ void Widget::calLastBracket(){
+    while (!operator_stk.empty() && operator_stk.top() != OpenBracket) {
+        if (operand_stk.size() < 2) {
+            throw new std::runtime_error("not enough operands in operand stack!");
+            return;
+        }
+        try {
+            // pop out one operator and two operands and process
+            Operation* p_opr = nullptr;
+            switch (operator_stk.top()) {
+            case Plus:
+                p_opr = OperationFactory::createOperation(Add);
+                break;
+            case Minus:
+                p_opr = OperationFactory::createOperation(Sub);
+                break;
+            case Multiply:
+                p_opr = OperationFactory::createOperation(Mul);
+                break;
+            case Division:
+                p_opr = OperationFactory::createOperation(Div);
+                break;
+            case OpenBracket:
+            case CloseBreaket:
+            default:
+                throw new std::runtime_error("undefined operation!");
+                return;
+            }
+            operator_stk.pop();
+            p_opr->setNumberB(operand_stk.top());
+            operand_stk.pop();
+            p_opr->setNumberA(operand_stk.top());
+            operand_stk.pop();
+            operand_stk.push(p_opr->getResult());
+        } catch (const std::exception& e) {
+            qDebug() << "calLastBracket caught exception:" << e.what();
+            throw e;
+            return;
+        }
+    }
+    if (!operator_stk.empty() && operator_stk.top() == OpenBracket)
+        operator_stk.pop();
+    return;
+}
+
+void Widget::calAllInStack() {
+    while (!operator_stk.empty()) {
+        if (operand_stk.size() < 2) {
+            throw new std::runtime_error("not enough operands in operand stack!");
+            return;
+        }
+        try {
+            // pop out one operator and two operands and process
+            Operation* p_opr = nullptr;
+            switch (operator_stk.top()) {
+            case Plus:
+                p_opr = OperationFactory::createOperation(Add);
+                break;
+            case Minus:
+                p_opr = OperationFactory::createOperation(Sub);
+                break;
+            case Multiply:
+                p_opr = OperationFactory::createOperation(Mul);
+                break;
+            case Division:
+                p_opr = OperationFactory::createOperation(Div);
+                break;
+            case OpenBracket:
+            case CloseBreaket:
+            default:
+                throw new std::runtime_error("undefined operation!");
+                return;
+            }
+            operator_stk.pop();
+            p_opr->setNumberB(operand_stk.top());
+            operand_stk.pop();
+            p_opr->setNumberA(operand_stk.top());
+            operand_stk.pop();
+            operand_stk.push(p_opr->getResult());
+        } catch (const std::exception& e) {
+            qDebug() << "calLastBracket caught exception:" << e.what();
+            throw e;
+            return;
+        }
+    }
+    return;
+}

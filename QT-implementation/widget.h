@@ -51,6 +51,10 @@ private slots:
     void changeSignClicked();
     void clearClicked();
     void equalClicked();
+    void refreshDisplay();
+    void calMulDiv();
+    void calLastBracket();
+    void calAllInStack();
 
 private:
     enum {
