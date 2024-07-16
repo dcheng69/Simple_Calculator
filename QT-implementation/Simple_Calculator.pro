@@ -14,9 +14,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         widget.cpp \
-    button.cpp
+    button.cpp \
+    operation.cpp \
+    operation_imp.cpp
 
 HEADERS  += widget.h \
-    button.h
+    button.h \
+    operation.h \
+    operation_imp.h
 
 FORMS    +=
