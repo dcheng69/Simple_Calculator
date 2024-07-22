@@ -390,6 +390,8 @@ void Widget::closeBracketClicked() {
             m_state = stateError;
             break;
         }
+        // display the result
+        display->setText(QString::number(operand_stk.top()));
         m_state = stateCloseBracket;
         break;
     case stateOperator:
