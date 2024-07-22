@@ -564,16 +564,17 @@ void Widget::calMulDiv() {
             return;
         }
         try {
-            Operation* p_opr = OperationFactory::createOperation(operator_stk.top());
-            p_opr->setNumberB(operand_stk.top());
+            SmartOperation s_pointer(OperationFactory::createOperation(operator_stk.top()));
+            s_pointer.getPointer()->setNumberB(operand_stk.top());
             operator_stk.pop();
             operand_stk.pop();
-            p_opr->setNumberA(operand_stk.top());
+            s_pointer.getPointer()->setNumberA(operand_stk.top());
             operand_stk.pop();
-            operand_stk.push(p_opr->getResult());
+            operand_stk.push(s_pointer.getPointer()->getResult());
         } catch (const std::exception& e) {
             qDebug() << "calMulDiv caught exception:" << e.what();
             throw e;
+            return;
         }
     }
     return;
@@ -587,13 +588,13 @@ void Widget::calMulDiv() {
         }
         try {
             // pop out one operator and two operands and process
-            Operation* p_opr = OperationFactory::createOperation(operator_stk.top());
-            p_opr->setNumberB(operand_stk.top());
+            SmartOperation s_pointer(OperationFactory::createOperation(operator_stk.top()));
+            s_pointer.getPointer()->setNumberB(operand_stk.top());
             operator_stk.pop();
             operand_stk.pop();
-            p_opr->setNumberA(operand_stk.top());
+            s_pointer.getPointer()->setNumberA(operand_stk.top());
             operand_stk.pop();
-            operand_stk.push(p_opr->getResult());
+            operand_stk.push(s_pointer.getPointer()->getResult());
         } catch (const std::exception& e) {
             qDebug() << "calLastBracket caught exception:" << e.what();
             throw e;
@@ -613,13 +614,13 @@ void Widget::calAllInStack() {
         }
         try {
             // pop out one operator and two operands and process
-            Operation* p_opr = OperationFactory::createOperation(operator_stk.top());
-            p_opr->setNumberB(operand_stk.top());
+            SmartOperation s_pointer(OperationFactory::createOperation(operator_stk.top()));
+            s_pointer.getPointer()->setNumberB(operand_stk.top());
             operator_stk.pop();
             operand_stk.pop();
-            p_opr->setNumberA(operand_stk.top());
+            s_pointer.getPointer()->setNumberA(operand_stk.top());
             operand_stk.pop();
-            operand_stk.push(p_opr->getResult());
+            operand_stk.push(s_pointer.getPointer()->getResult());
         } catch (const std::exception& e) {
             qDebug() << "calLastBracket caught exception:" << e.what();
             throw e;

@@ -29,5 +29,20 @@ public:
     static Operation* createOperation(operationType type);
 };
 
+class SmartOperation {
+private:
+    Operation* p_opr = nullptr;
+public:
+    SmartOperation(Operation* p_opr): p_opr(p_opr){}
+    ~SmartOperation() {
+        if (p_opr)
+            delete p_opr;
+        p_opr = nullptr;
+    }
+    Operation* getPointer() {
+        return p_opr;
+    }
+};
+
 
 #endif // OPERATION_IMP_H
