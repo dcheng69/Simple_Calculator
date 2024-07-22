@@ -178,6 +178,7 @@ void Widget::plusClicked() {
             qCritical() << "calMulDiv error:" << e.what();
             display->setText("error!");
             m_state = stateError;
+            break;
         }
         m_operator = Plus;
         m_state = stateOperator;
@@ -221,6 +222,7 @@ void Widget::minusClick() {
             qCritical() << "calMulDiv error:" << e.what();
             display->setText("error!");
             m_state = stateError;
+            break;
         }
         m_operator = Minus;
         m_state = stateOperator;
@@ -264,6 +266,7 @@ void Widget::multiplyClicked() {
             qCritical() << "calMulDiv error:" << e.what();
             display->setText("error!");
             m_state = stateError;
+            break;
         }
         m_operator = Multiply;
         m_state = stateOperator;
@@ -307,6 +310,7 @@ void Widget::divisionClicked() {
             qCritical() << "calMulDiv error:" << e.what();
             display->setText("error!");
             m_state = stateError;
+            break;
         }
         m_operator = Division;
         m_state = stateOperator;
@@ -384,6 +388,7 @@ void Widget::closeBracketClicked() {
             qCritical() << "calLastBracket error:" << e.what();
             display->setText("error!");
             m_state = stateError;
+            break;
         }
         m_state = stateCloseBracket;
         break;
@@ -405,6 +410,7 @@ void Widget::closeBracketClicked() {
             qCritical() << "calLastBracket error:" << e.what();
             display->setText("error!");
             m_state = stateError;
+            break;
         }
         break;
     case stateChangeSign:
@@ -414,6 +420,7 @@ void Widget::closeBracketClicked() {
             qCritical() << "calLastBracket error:" << e.what();
             display->setText("error!");
             m_state = stateError;
+            break;
         }
         m_state = stateCloseBracket;
         break;
@@ -498,6 +505,7 @@ void Widget::equalClicked() {
             qCritical() << "calAllInStack error:" << e.what();
             display->setText("error!");
             m_state = stateError;
+            break;
         }
         m_result = operand_stk.top();
         display->setText(QString::number(m_result));
@@ -523,6 +531,7 @@ void Widget::equalClicked() {
             qCritical() << "calAllInStack error:" << e.what();
             display->setText("error!");
             m_state = stateError;
+            break;
         }
         m_result = operand_stk.top();
         display->setText(QString::number(m_result));
@@ -539,6 +548,7 @@ void Widget::equalClicked() {
             qCritical() << "calAllInStack error:" << e.what();
             display->setText("error!");
             m_state = stateError;
+            break;
         }
         m_result = operand_stk.top();
         display->setText(QString::number(m_result));
